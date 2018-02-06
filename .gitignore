@@ -37,3 +37,6 @@ dwsync.xml
 intermediate
 .idea
 cache
+plugin-name/.travis.yml
+plugin-name/bin/
+plugin-name/report/
