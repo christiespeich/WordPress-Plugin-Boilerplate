@@ -35,14 +35,39 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'PLUGIN_NAME_VERSION', '1.0.0' );
+if ( ! defined( 'PLUGIN_NAME_VERSION' ) ) {
+	define( 'PLUGIN_NAME_VERSION', '1.0.0' );
+}
+
+if ( ! defined( 'PLUGIN_NAME_PLUGIN_VERSION_KEY' ) ) {
+	define( 'PLUGIN_NAME_PLUGIN_VERSION_KEY', 'plugin_name_version' );
+}
+
+if ( ! defined( 'PLUGIN_NAME_PLUGIN_DIR' ) ) {
+	define( 'PLUGIN_NAME_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+}
+
+// Plugin Folder URL
+if ( ! defined( 'PLUGIN_NAME_PLUGIN_URL' ) ) {
+	define( 'PLUGIN_NAME_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+}
+
+// Plugin Root File
+if ( ! defined( 'PLUGIN_NAME_PLUGIN_FILE' ) ) {
+	define( 'PLUGIN_NAME_PLUGIN_FILE', __FILE__ );
+}
+
+
+
+
+
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-plugin-name-activator.php
  */
 function activate_plugin_name() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-plugin-name-activator.php';
+	require_once PLUGIN_NAME_PLUGIN_DIR . 'includes/class-plugin-name-activator.php';
 	Plugin_Name_Activator::activate();
 }
 
@@ -51,7 +76,7 @@ function activate_plugin_name() {
  * This action is documented in includes/class-plugin-name-deactivator.php
  */
 function deactivate_plugin_name() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-plugin-name-deactivator.php';
+	require_once PLUGIN_NAME_PLUGIN_DIR . 'includes/class-plugin-name-deactivator.php';
 	Plugin_Name_Deactivator::deactivate();
 }
 
@@ -62,7 +87,7 @@ register_deactivation_hook( __FILE__, 'deactivate_plugin_name' );
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-plugin-name.php';
+require PLUGIN_NAME_PLUGIN_DIR . 'includes/class-plugin-name.php';
 
 /**
  * Begins execution of the plugin.
@@ -75,8 +100,21 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-plugin-name.php';
  */
 function run_plugin_name() {
 
-	$plugin = new Plugin_Name();
-	$plugin->run();
+	// plugin dependencies
+	if ( plugin_name_dependencies_satisfied() ) {
+		$plugin = new Plugin_Name();
+		$plugin->run();
+	}
+}
+add_action( 'plugins_loaded', 'run_plugin_name');
+
+
+function plugin_name_dependencies_satisfied() {
+	require_once PLUGIN_NAME_PLUGIN_DIR . 'includes/vendor/mooberry-dreams/class-plugin-name-dependency-manager.php';
+	$dependencies = new Plugin_Name_Dependency_Manager();
+	// add dependencies like this:  the activation function name is a good one to use
+	//$dependencies->add( 'mbdbai_activate' );
+
+	return $dependencies->check();
 
 }
-run_plugin_name();
