@@ -76,6 +76,7 @@ class Plugin_Name {
 
 		$this->load_dependencies();
 		$this->set_locale();
+		$this->perform_updates();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 
@@ -122,6 +123,10 @@ class Plugin_Name {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-plugin-name-public.php';
 
+		require_once PLUGIN_NAME_PLUGIN_DIR . 'includes/vendor/mooberry-dreams/class-plugin-name-admin-notice-manager.php';
+		require_once PLUGIN_NAME_PLUGIN_DIR . 'includes/vendor/mooberry-dreams/metaboxes/class-metabox.php';
+		require_once PLUGIN_NAME_PLUGIN_DIR . 'includes/vendor/mooberry-dreams/post-types/class-custom-post-type.php';
+
 		$this->loader = new Plugin_Name_Loader();
 
 	}
@@ -144,6 +149,24 @@ class Plugin_Name {
 	}
 
 	/**
+	 * Runs any updates needed.
+	 *
+	 * Uses the Plugin_Name_Updates class in order to check for and run updates
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function perform_updates() {
+
+		require_once PLUGIN_NAME_PLUGIN_DIR . 'includes/vendor/mooberry-dreams/class-plugin-name-updates.php';
+
+		$plugin_updates = new Plugin_Name_Updates( $this->version );
+
+		$this->loader->add_action( 'init', $plugin_updates, 'check_for_updates' );
+
+	}
+
+	/**
 	 * Register all of the hooks related to the admin area functionality
 	 * of the plugin.
 	 *
@@ -152,10 +175,11 @@ class Plugin_Name {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Plugin_Name_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Plugin_Name_Admin( $this->get_plugin_name(), $this->get_version(), new Plugin_Name_Admin_Notice_Manager() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_action( 'admin_notices', $plugin_admin, 'admin_notices' );
 
 	}
 
